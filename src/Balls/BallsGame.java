@@ -20,6 +20,11 @@ public class BallsGame extends JPanel implements MouseListener {
     private int canvasHeight;
     private DrawCanvas canvas;
 
+    //
+    float distance;
+    float deltaX;
+    float deltaY;
+
     //draw frame per second
     public static final int FPS_RATE = 120;
 
@@ -38,7 +43,6 @@ public class BallsGame extends JPanel implements MouseListener {
     }
 
     public void start() {
-
         Thread t = new Thread() {
             public void run() {
                 while (true) {
@@ -57,8 +61,10 @@ public class BallsGame extends JPanel implements MouseListener {
     public void update() {
         for (Ball ball : balls) {
             ball.movePhysics(box);
+            ball.checkCollision(ball, ball);
         }
     }
+
 
     class DrawCanvas extends JPanel {
         public void paintComponent(Graphics g) {

@@ -14,20 +14,18 @@ public class BallsMain {
         mainWindow = new JFrame("Menu");
 
         start = new JButton("Start");
-        start.setBounds(70,100,150,80);
+        start.setBounds(115,150,150,80);
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 t.start();
             }
         });
-        mainWindow.setContentPane(start);
         mainWindow.setSize(600,600);
-        //mainWindow.pack();
-        /*mainWindow.add(start);
+        mainWindow.add(start);
         mainWindow.setSize(400,400);
         mainWindow.setLayout(null);
-        mainWindow.setVisible(true);*/
+        mainWindow.setVisible(true);
         mainWindow.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainWindow.setVisible(true);
     }
