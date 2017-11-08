@@ -1,6 +1,7 @@
 package Balls;
 
 import java.awt.*;
+import java.util.Formatter;
 import java.util.Random;
 
 public class Ball {
@@ -15,6 +16,10 @@ public class Ball {
     float speedX = (r.nextFloat()*(10-0.5f)+0.5f); //(maxX - minX) + minX
     float speedY = (r.nextFloat()*(10-0.5f)+0.5f); //(maxX - minX) + minX
 
+    public float getSpeedY() {
+        return speedY;
+    }
+
     //randomize coordinates
     float circleX = (r.nextInt()*(BOX_WIDTH - radius));
     float circleY = (r.nextInt()*(BOX_HEIGHT - radius));
@@ -28,10 +33,13 @@ public class Ball {
     public Ball() {
     }
 
-    //drawing a ball
+
     public void draw(Graphics g) {
+
+        //draw a ball
         g.setColor(new Color(red, green, blue));
         g.fillOval((int) (circleX - radius), (int) (circleY - radius), (int) (2 * radius), (int) (2 * radius));
+
     }
 
     public void movePhysics(Container container) {

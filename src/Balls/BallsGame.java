@@ -2,9 +2,12 @@ package Balls;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 
 public class BallsGame extends JPanel implements MouseListener {
@@ -58,7 +61,6 @@ public class BallsGame extends JPanel implements MouseListener {
     }
 
     class DrawCanvas extends JPanel {
-
         public void paintComponent(Graphics g) {
 
             super.paintComponent(g);
@@ -66,6 +68,15 @@ public class BallsGame extends JPanel implements MouseListener {
             for (Ball ball : balls) {
                 ball.draw(g);
             }
+
+            //Count information
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Courier New", Font.PLAIN, 12));
+            StringBuilder sb = new StringBuilder();
+            Formatter formatter = new Formatter(sb);
+            formatter.format("Count of balls: " + count);
+            g.drawString(sb.toString(), 20, 30);
+
         }
 
         public Dimension getPreferredSize() {
