@@ -8,30 +8,40 @@ public class Ball {
 
     //size of Box
     private static final int BOX_HEIGHT = 600;
-    private static final int BOX_WIDTH = 600;
+    private static final int BOX_WIDTH = 1366;
 
     Random r = new Random();
 
-    float radius = (r.nextFloat() * 40);
-    float speedX = (r.nextFloat() * (2 - 0.1f) + 0.1f); //(maxX - minX) + minX
-    float speedY = (r.nextFloat() * (2 - 0.1f) + 0.1f); //(maxX - minX) + minX
+    private float radius;
+    private float speedX;
+    private float speedY;
 
     //randomize coordinates
-    float circleX = (r.nextInt() * (BOX_WIDTH - radius));
-    float circleY = (r.nextInt() * (BOX_HEIGHT - radius));
+    private float circleX;
+    private float circleY;
 
     //
-    float distance;
-    float deltaX;
-    float deltaY;
+    private float distance;
+    private float deltaX;
+    private float deltaY;
 
     //color palette by RGB
-    int red = r.nextInt(255);
-    int green = r.nextInt(255);
-    int blue = r.nextInt(255);
-
+    private int red;
+    private int green;
+    private int blue;
 
     public Ball() {
+        radius = (r.nextFloat() * (40 - 2) + 2);
+        speedX = (r.nextFloat() * (5 - 0.1f) + 0.1f); //(maxX - minX) + minX
+        speedY = (r.nextFloat() * (5 - 0.1f) + 0.1f); //(maxX - minX) + minX
+
+        //randomize coordinates
+        circleX = (r.nextInt() * (BOX_WIDTH - radius));
+        circleY = (r.nextInt() * (BOX_HEIGHT - radius));
+
+        red = r.nextInt(255);
+        green = r.nextInt(255);
+        blue = r.nextInt(255);
     }
 
 
@@ -62,27 +72,27 @@ public class Ball {
         return speedX;
     }
 
-    public void setRadius (float rad) {
+    public void setRadius(float rad) {
         this.radius = rad;
     }
 
-    public void setSpeedX (float speed) {
+    public void setSpeedX(float speed) {
         this.speedX = speed;
     }
 
-    public void setSpeedY (float speed) {
+    public void setSpeedY(float speed) {
         this.speedY = speed;
     }
 
-    public void setCircleX (float circleX) {
+    public void setCircleX(float circleX) {
         this.circleX = circleX;
     }
 
-    public void setCircleY (float circleY) {
+    public void setCircleY(float circleY) {
         this.circleY = circleY;
     }
 
-    public void checkCollision(Ball b1, Ball b2) {
+    /*public void checkCollision(Ball b1, Ball b2) {
 
         deltaX = Math.abs(b1.getCircleX() - b2.getCircleX());
         deltaY = Math.abs(b1.getCircleY() - b2.getCircleY());
@@ -104,9 +114,9 @@ public class Ball {
             b1.setSpeedY(newySpeed1);
 
         }
-    }
+    }*/
 
-    public void movePhysics(Container container) {
+    public void movePhysics() {
         circleX += speedX; //run the ball
         circleY += speedY;
         // Check if the ball moves over the bounds
