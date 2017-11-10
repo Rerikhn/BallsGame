@@ -7,8 +7,6 @@ public class BallsMain {
 
     private JFrame mainWindow;
     private JButton start;
-    private JPopupMenu popupMenu;
-    private JButton pause;
 
     BallsMain() {
         mainWindow = new JFrame("Menu");
@@ -21,11 +19,12 @@ public class BallsMain {
             }
         });
         mainWindow.add(start);
-        mainWindow.setSize(400, 400);
+        mainWindow.setSize(1366, 768);
         mainWindow.setLayout(null);
         mainWindow.setVisible(true);
         mainWindow.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainWindow.setVisible(true);
+        mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     Runnable r = new Runnable() {

@@ -7,7 +7,7 @@ import java.util.Random;
 public class Ball {
 
     //size of Box
-    private static final int BOX_HEIGHT = 600;
+    private static final int BOX_HEIGHT = 725;
     private static final int BOX_WIDTH = 1366;
 
     Random r = new Random();
@@ -15,15 +15,11 @@ public class Ball {
     private float radius;
     private float speedX;
     private float speedY;
+    //private float maxspeed;
 
     //randomize coordinates
     private float circleX;
     private float circleY;
-
-    //
-    private float distance;
-    private float deltaX;
-    private float deltaY;
 
     //color palette by RGB
     private int red;
@@ -31,13 +27,13 @@ public class Ball {
     private int blue;
 
     public Ball() {
-        radius = (r.nextFloat() * (40 - 2) + 2);
-        speedX = (r.nextFloat() * (5 - 0.1f) + 0.1f); //(maxX - minX) + minX
-        speedY = (r.nextFloat() * (5 - 0.1f) + 0.1f); //(maxX - minX) + minX
+        radius = (r.nextFloat() * (10 - 7) + 7);
+        speedX = (r.nextFloat() * (1f - 0.1f) + 0.1f); //(maxX - minX) + minX
+        speedY = (r.nextFloat() * (1f - 0.1f) + 0.1f); //(maxX - minX) + minX
 
         //randomize coordinates
-        circleX = (r.nextInt() * (BOX_WIDTH - radius));
-        circleY = (r.nextInt() * (BOX_HEIGHT - radius));
+        circleX = (r.nextInt() * ((BOX_WIDTH-radius)-BOX_WIDTH/2)+BOX_WIDTH/2);
+        circleY = (r.nextInt() * ((BOX_HEIGHT - radius)-BOX_HEIGHT/2)+BOX_HEIGHT/2);
 
         red = r.nextInt(255);
         green = r.nextInt(255);
@@ -92,29 +88,6 @@ public class Ball {
         this.circleY = circleY;
     }
 
-    /*public void checkCollision(Ball b1, Ball b2) {
-
-        deltaX = Math.abs(b1.getCircleX() - b2.getCircleX());
-        deltaY = Math.abs(b1.getCircleY() - b2.getCircleY());
-        distance = deltaX * deltaX + deltaY * deltaY;
-
-        if (distance < (b1.getRadius() + b2.getRadius()) * (b1.getRadius() + b2.getRadius())) {
-
-            float newxSpeed1 = (b1.getSpeedX() * (4 - 7) + (2 * 7 * b2.getSpeedX())) / 11;
-
-            float newxSpeed2 = (b2.getSpeedX() * (7 - 4) + (2 * 4 * b1.getSpeedX())) / 11;
-
-            float newySpeed1 = (b1.getSpeedY() * (4 - 7) + (2 * 7 * b2.getSpeedY())) / 11;
-
-            float newySpeed2 = (b2.getSpeedY() * (7 - 4) + (2 * 4 * b1.getSpeedY())) / 11;
-
-            b2.setSpeedX(newxSpeed2);
-            b2.setSpeedY(newySpeed2);
-            b1.setSpeedX(newxSpeed1);
-            b1.setSpeedY(newySpeed1);
-
-        }
-    }*/
 
     public void movePhysics() {
         circleX += speedX; //run the ball
