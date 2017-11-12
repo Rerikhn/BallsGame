@@ -9,12 +9,14 @@ import java.util.*;
 import java.util.Formatter;
 import java.util.List;
 
-public class BallsGame extends JPanel implements MouseListener {
+public class BallsGame
+        extends JPanel
+        implements MouseListener {
 
     /**
      * ArrayList of many balls
      */
-    protected List<Ball> balls = new ArrayList<Ball>();
+    protected ArrayList<Ball> balls = new ArrayList<Ball>();
 
     private Container box;
     private int canvasWidth;
@@ -23,12 +25,17 @@ public class BallsGame extends JPanel implements MouseListener {
     private JMenu menu, submenu;
     private JMenuItem i1, i2, i3;
     private Thread game;
-    private JSlider fps;
+
+    /**
+     * The current motion of this ball.
+     * This vector is added to the position at each step.
+     */
+
 
     /**
      * Draw frame per second
      */
-    private static int UPDATE_RATE = 120;
+    private static int UPDATE_RATE = 60;
 
     /**
      * Count of balls
@@ -70,13 +77,18 @@ public class BallsGame extends JPanel implements MouseListener {
             }
         });
 
-        JSlider js=new JSlider(60,660,120);
+        JSlider js = new JSlider(30, 240, 60);
         js.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 if (source.getValueIsAdjusting()) {
                     UPDATE_RATE = source.getValue();
+                    /*Ball[] ball = balls.toArray(new Ball[balls.size()]);
+                    for(int i =0; i<ball.length; i++ ) {
+                        ball[i].setSpeedY((float)source.getValue()/10 + ball[i].getSpeedY());
+                        ball[i].setSpeedX((float)source.getValue()/10 + ball[i].getSpeedX());
+                    }*/
                 }
             }
         });
@@ -84,9 +96,8 @@ public class BallsGame extends JPanel implements MouseListener {
         js.setMajorTickSpacing(120);
         js.setPaintTicks(true);
         js.setPaintLabels(true);
-        JMenu update=new JMenu("Update Rate");
+        JMenu update = new JMenu("Update Rate");
         update.add(js);
-
 
         submenu.add(i3);
         menu.add(i1);
@@ -130,20 +141,19 @@ public class BallsGame extends JPanel implements MouseListener {
         Ball[] ball = balls.toArray(new Ball[balls.size()]);
         for (int i = 0; i < ball.length; i++) {
             ball[i].movePhysics();
-            /*if (ball[i].getSpeedX() > 10 || ball[i].getSpeedY() > 10) {
-                balls.remove(i);
-                count--;
-            }*/
-            //checkMaxSpeed(ball[i]);
             for (int j = i + 1; j < ball.length; j++) {
-                checkCollision(ball[i], ball[j]);
+                if (ball[i].colliding(ball[j])) {
+                    ball[i].resolveCollision(ball[j]);
+                    //ball[i].reverseColor(ball[i], ball[j]);
+                    //ball[i].agarIO(ball[i], ball[j], balls, j);
+                }
             }
         }
     }
 
     public void checkMaxSpeed(Ball ball) {
-        if (ball.getSpeedX() > 5) ball.setSpeedX(5);
-        if (ball.getSpeedY() > 5) ball.setSpeedY(5);
+        if (ball.velocity.getX() > 5) ball.velocity.setX(5);
+        if (ball.velocity.getY() > 5) ball.velocity.setY(5);
     }
 
     class DrawCanvas extends JPanel {
@@ -196,7 +206,7 @@ public class BallsGame extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (balls.size() < 100) {
+        if (balls.size() < 1000) {
             count++;
             balls.add(new Ball());
         }
@@ -206,30 +216,4 @@ public class BallsGame extends JPanel implements MouseListener {
     public void mouseReleased(MouseEvent e) {
         // TODO Auto-generated method stub
     }
-
-
-    public void checkCollision(Ball b1, Ball b2) {
-
-        float deltaX = Math.abs(b1.getCircleX() - b2.getCircleX());
-        float deltaY = Math.abs(b1.getCircleY() - b2.getCircleY());
-        float distance = deltaX * deltaX + deltaY * deltaY;
-
-        if (distance < (b1.getRadius() + b2.getRadius()) * (b1.getRadius() + b2.getRadius())) {
-
-            float newxSpeed1 = (b1.getSpeedX() * (4 - 7) + (2 * 7 * b2.getSpeedX())) / 11;
-
-            float newxSpeed2 = (b2.getSpeedX() * (7 - 4) + (2 * 4 * b1.getSpeedX())) / 11;
-
-            float newySpeed1 = (b1.getSpeedY() * (4 - 7) + (2 * 7 * b2.getSpeedY())) / 11;
-
-            float newySpeed2 = (b2.getSpeedY() * (7 - 4) + (2 * 4 * b1.getSpeedY())) / 11;
-
-            b2.setSpeedX(newxSpeed2);
-            b2.setSpeedY(newySpeed2);
-            b1.setSpeedX(newxSpeed1);
-            b1.setSpeedY(newySpeed1);
-
-        }
-    }
-
 }
