@@ -37,7 +37,7 @@ public class Ball {
                 (r.nextInt() * ((BOX_WIDTH - radius) - BOX_WIDTH / 2) + BOX_WIDTH / 2),
                 (r.nextInt() * ((BOX_HEIGHT - radius) - BOX_HEIGHT / 2) + BOX_HEIGHT / 2));
 
-        radius = (r.nextFloat() * (5 - 2) + 2);
+        radius = (r.nextFloat() * (7 - 2) + 2);
 
         mass = radius * Constants.pi;
 
@@ -54,14 +54,14 @@ public class Ball {
     /**
      * THE BIG BALL!!!
      */
-    public Ball(Vector2d velocity, float radius) {
+    public Ball(Vector2d velocity, float radius, float mas) {
         this.velocity = velocity;
         this.radius = radius;
 
         position = new Vector2d(
                 (r.nextInt() * ((BOX_WIDTH - radius) - BOX_WIDTH / 2) + BOX_WIDTH / 2),
                 (r.nextInt() * ((BOX_HEIGHT - radius) - BOX_HEIGHT / 2) + BOX_HEIGHT / 2));
-        mass = (radius * Constants.pi); //Manual mass to biggest ball
+        mass = mas + (radius * Constants.pi); //Manual mass to biggest ball
 
         red = r.nextInt(255);
         green = r.nextInt(255);
@@ -79,23 +79,21 @@ public class Ball {
         g2d.fillOval((int) (position.getX() - radius), (int) (position.getY() - radius), (int) (2 * radius), (int) (2 * radius));
     }
 
-    public void reverseColor(Ball b1, Ball b2, boolean truth) {
+    public void reverseColor(Ball b1, boolean truth) {
         if (truth == true) {
             int rb1, gb1, bb1;
             rb1 = b1.getRed();
             gb1 = b1.getGreen();
             bb1 = b1.getBlue();
-            b1.setRGB(b2.getRed(), b2.getGreen(), b2.getBlue());
-            b2.setRGB(rb1, gb1, bb1);
+            b1.setRGB(this.getRed(), this.getGreen(), this.getBlue());
+            this.setRGB(rb1, gb1, bb1);
         }
     }
 
-    public void agarIO(Ball b1, Ball b2, ArrayList<Ball> temp, int i, boolean truth) {
+    public void agarIO(Ball b1, ArrayList<Ball> temp, int i, boolean truth) {
         if (truth == true) {
-            b1.setRadius(b2.getRadius() + b1.getRadius());
-            b2.setRadius(b1.getRadius() + b2.getRadius());
-            if (temp.size() > 1)
-                temp.remove(i);
+            float rad = b1.getRadius();
+            this.setRadius(getRadius() + rad);
         }
     }
 
@@ -107,6 +105,22 @@ public class Ball {
 
     public int getRed() {
         return red;
+    }
+
+    public float getVelocityX() {
+        return velocity.getX();
+    }
+
+    public float getVelocityY() {
+        return velocity.getY();
+    }
+
+    public void setVelocityX(float x) {
+        this.velocity.setX(x);
+    }
+
+    public void setVelocityY (float y) {
+        this.velocity.setY(y);
     }
 
     public int getGreen() {

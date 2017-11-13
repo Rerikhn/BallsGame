@@ -23,12 +23,14 @@ public class BallsGame
     private int canvasHeight;
     private DrawCanvas canvas;
     private JMenu menu, submenu;
-    private JMenuItem i1, i2, i3 , bigBall, agar;
-    private JCheckBox recolor, colliding;
+    private JMenuItem i1, i2, i3, bigBall;
+    private JCheckBox recolor, colliding, agarIO;
     private Thread game;
-
+    private float massBig;
     private boolean truthColor = false;
     private boolean truthCollide = false;
+    private boolean truthIO = false;
+    private int click;
 
     /**
      * The current motion of this ball.
@@ -54,8 +56,8 @@ public class BallsGame
         bigBall.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Vector2d velocity = new Vector2d(6,6);
-                balls.add(new Ball(velocity, 50));
+                Vector2d velocity = new Vector2d(6, 6);
+                balls.add(new Ball(velocity, 50, massBig));
             }
         });
 
@@ -100,7 +102,21 @@ public class BallsGame
             }
         });
 
-        colliding = new JCheckBox("Turn on/off colliding");
+        /*agarIO = new JCheckBox("ON/OFF agarIO");
+        agarIO.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                JCheckBox cbLog = (JCheckBox) e.getSource();
+                if (cbLog.isSelected()) {
+                    truthIO = true;
+                } else {
+                    truthIO = false;
+                }
+            }
+        });*/
+
+
+        colliding = new JCheckBox("ON/OFF colliding");
         colliding.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -114,7 +130,37 @@ public class BallsGame
         });
 
 
-        JSlider js = new JSlider(30, 1000, 60);
+        SpinnerModel value = new SpinnerNumberModel(1,1,100,1);
+        JSpinner clicks = new JSpinner(value);
+        clicks.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                click = (int)((JSpinner)e.getSource()).getValue();
+            }
+        });
+        JMenu spinMenu = new JMenu("Clicks");
+        spinMenu.add(clicks);
+
+
+        JSlider speed = new JSlider(0, 1000, 0);
+        speed.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                if (source.getValueIsAdjusting()) {
+                    massBig = source.getValue();
+                }
+            }
+        });
+        speed.setMinorTickSpacing(1);
+        speed.setMajorTickSpacing(19);
+        speed.setPaintTicks(true);
+        speed.setPaintLabels(true);
+        JMenu speedMenu = new JMenu("Mass of big ball");
+        speedMenu.add(speed);
+
+
+        JSlider js = new JSlider(30, 1000, UPDATE_RATE);
         js.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -138,8 +184,11 @@ public class BallsGame
         menu.add(submenu);
         bar.add(menu);
         bar.add(update);
+        bar.add(speedMenu);
         bar.add(recolor);
         bar.add(colliding);
+        //bar.add(agarIO);
+        bar.add(spinMenu);
 
         canvasWidth = width;
         canvasHeight = height;
@@ -179,8 +228,8 @@ public class BallsGame
             for (int j = i + 1; j < ball.length; j++) {
                 if (ball[i].colliding(ball[j])) {
                     ball[i].resolveCollision(ball[j], truthCollide);
-                    ball[i].reverseColor(ball[i], ball[j], truthColor);
-                    //ball[i].agarIO(ball[i], ball[j], balls, j, truth);
+                    ball[i].reverseColor(ball[j], truthColor);
+                    //ball[i].agarIO(ball[j], balls, j, truthIO);
                 }
             }
         }
@@ -212,6 +261,7 @@ public class BallsGame
             formatter.format("Current update rate: " + UPDATE_RATE);
             g.drawString(sb.toString(), 170, 30);
         }
+
         public Dimension getPreferredSize() {
             return (new Dimension(canvasWidth, canvasHeight));
         }
@@ -235,9 +285,9 @@ public class BallsGame
     @Override
     public void mousePressed(MouseEvent e) {
         if (balls.size() < 10000) {
-            count+=100;
-            for (int i = 0; i<100; i++)
-            balls.add(new Ball());
+            count += click;
+            for (int i = 0; i < click; i++)
+                balls.add(new Ball());
         }
     }
 
