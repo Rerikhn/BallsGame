@@ -23,8 +23,12 @@ public class BallsGame
     private int canvasHeight;
     private DrawCanvas canvas;
     private JMenu menu, submenu;
-    private JMenuItem i1, i2, i3;
+    private JMenuItem i1, i2, i3 , bigBall, agar;
+    private JCheckBox recolor, colliding;
     private Thread game;
+
+    private boolean truthColor = false;
+    private boolean truthCollide = false;
 
     /**
      * The current motion of this ball.
@@ -32,14 +36,10 @@ public class BallsGame
      */
 
 
-    /**
-     * Draw frame per second
-     */
+    /*** Draw frame per second*/
     private static int UPDATE_RATE = 60;
 
-    /**
-     * Count of balls
-     */
+    /*** Count of balls */
     int count = 0;
 
     public BallsGame(int width, int height) {
@@ -48,6 +48,16 @@ public class BallsGame
         /** Upper menu */
         menu = new JMenu("Menu");
         submenu = new JMenu("Specific");
+
+        /** Throw a big ball */
+        bigBall = new JMenuItem("Run the big!");
+        bigBall.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Vector2d velocity = new Vector2d(6,6);
+                balls.add(new Ball(velocity, 50));
+            }
+        });
 
         /** Pause thread */
         i1 = new JMenuItem("Pause");
@@ -77,18 +87,40 @@ public class BallsGame
             }
         });
 
-        JSlider js = new JSlider(30, 240, 60);
+        recolor = new JCheckBox("Reverse color");
+        recolor.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                JCheckBox cbLog = (JCheckBox) e.getSource();
+                if (cbLog.isSelected()) {
+                    truthColor = true;
+                } else {
+                    truthColor = false;
+                }
+            }
+        });
+
+        colliding = new JCheckBox("Turn on/off colliding");
+        colliding.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                JCheckBox cbLog = (JCheckBox) e.getSource();
+                if (cbLog.isSelected()) {
+                    truthCollide = true;
+                } else {
+                    truthCollide = false;
+                }
+            }
+        });
+
+
+        JSlider js = new JSlider(30, 1000, 60);
         js.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 if (source.getValueIsAdjusting()) {
                     UPDATE_RATE = source.getValue();
-                    /*Ball[] ball = balls.toArray(new Ball[balls.size()]);
-                    for(int i =0; i<ball.length; i++ ) {
-                        ball[i].setSpeedY((float)source.getValue()/10 + ball[i].getSpeedY());
-                        ball[i].setSpeedX((float)source.getValue()/10 + ball[i].getSpeedX());
-                    }*/
                 }
             }
         });
@@ -100,11 +132,15 @@ public class BallsGame
         update.add(js);
 
         submenu.add(i3);
+        submenu.add(bigBall);
         menu.add(i1);
         menu.add(i2);
         menu.add(submenu);
         bar.add(menu);
         bar.add(update);
+        bar.add(recolor);
+        bar.add(colliding);
+
         canvasWidth = width;
         canvasHeight = height;
         box = new Container();
@@ -114,7 +150,6 @@ public class BallsGame
         this.setLayout(new BorderLayout());
         this.add(canvas, BorderLayout.CENTER);
         this.add(bar, BorderLayout.NORTH);
-        //this.add(fps, BorderLayout.AFTER_LAST_LINE);
         this.addMouseListener(this);
 
         start();
@@ -143,17 +178,12 @@ public class BallsGame
             ball[i].movePhysics();
             for (int j = i + 1; j < ball.length; j++) {
                 if (ball[i].colliding(ball[j])) {
-                    ball[i].resolveCollision(ball[j]);
-                    //ball[i].reverseColor(ball[i], ball[j]);
-                    //ball[i].agarIO(ball[i], ball[j], balls, j);
+                    ball[i].resolveCollision(ball[j], truthCollide);
+                    ball[i].reverseColor(ball[i], ball[j], truthColor);
+                    //ball[i].agarIO(ball[i], ball[j], balls, j, truth);
                 }
             }
         }
-    }
-
-    public void checkMaxSpeed(Ball ball) {
-        if (ball.velocity.getX() > 5) ball.velocity.setX(5);
-        if (ball.velocity.getY() > 5) ball.velocity.setY(5);
     }
 
     class DrawCanvas extends JPanel {
@@ -181,9 +211,7 @@ public class BallsGame
             formatter = new Formatter(sb);
             formatter.format("Current update rate: " + UPDATE_RATE);
             g.drawString(sb.toString(), 170, 30);
-
         }
-
         public Dimension getPreferredSize() {
             return (new Dimension(canvasWidth, canvasHeight));
         }
@@ -206,8 +234,9 @@ public class BallsGame
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (balls.size() < 1000) {
-            count++;
+        if (balls.size() < 10000) {
+            count+=100;
+            for (int i = 0; i<100; i++)
             balls.add(new Ball());
         }
     }

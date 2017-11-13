@@ -15,8 +15,9 @@ public class Ball {
     /**
      * For Vectors
      */
-    public Vector2d velocity;
-    public Vector2d position;
+    private Vector2d velocity;
+    private Vector2d position;
+
     private float radius;
     private float mass;
     private float density;
@@ -28,18 +29,15 @@ public class Ball {
     private int blue;
 
     public Ball() {
-
-        /**
-         * Randomize Vector's for each
-         * */
-        velocity = new Vector2d((r.nextFloat() * (3f - 0.1f) + 0.1f),
-                (r.nextFloat() * (3f - 0.1f) + 0.1f));
+        /** Randomize Vector's for each */
+        velocity = new Vector2d((r.nextFloat() * (2f - 0.1f) + 0.1f),
+                (r.nextFloat() * (2f - 0.1f) + 0.1f));
 
         position = new Vector2d(
                 (r.nextInt() * ((BOX_WIDTH - radius) - BOX_WIDTH / 2) + BOX_WIDTH / 2),
                 (r.nextInt() * ((BOX_HEIGHT - radius) - BOX_HEIGHT / 2) + BOX_HEIGHT / 2));
 
-        radius = (r.nextFloat() * (50 - 7) + 7);
+        radius = (r.nextFloat() * (5 - 2) + 2);
 
         mass = radius * Constants.pi;
 
@@ -48,6 +46,23 @@ public class Ball {
         /**
          * Randomize color set for each
          * */
+        red = r.nextInt(255);
+        green = r.nextInt(255);
+        blue = r.nextInt(255);
+    }
+
+    /**
+     * THE BIG BALL!!!
+     */
+    public Ball(Vector2d velocity, float radius) {
+        this.velocity = velocity;
+        this.radius = radius;
+
+        position = new Vector2d(
+                (r.nextInt() * ((BOX_WIDTH - radius) - BOX_WIDTH / 2) + BOX_WIDTH / 2),
+                (r.nextInt() * ((BOX_HEIGHT - radius) - BOX_HEIGHT / 2) + BOX_HEIGHT / 2));
+        mass = (radius * Constants.pi); //Manual mass to biggest ball
+
         red = r.nextInt(255);
         green = r.nextInt(255);
         blue = r.nextInt(255);
@@ -64,20 +79,24 @@ public class Ball {
         g2d.fillOval((int) (position.getX() - radius), (int) (position.getY() - radius), (int) (2 * radius), (int) (2 * radius));
     }
 
-    public void reverseColor(Ball b1, Ball b2) {
-        int rb1, gb1, bb1;
-        rb1 = b1.getRed();
-        gb1 = b1.getGreen();
-        bb1 = b1.getBlue();
-        b1.setRGB(b2.getRed(), b2.getGreen(), b2.getBlue());
-        b2.setRGB(rb1,gb1,bb1);
+    public void reverseColor(Ball b1, Ball b2, boolean truth) {
+        if (truth == true) {
+            int rb1, gb1, bb1;
+            rb1 = b1.getRed();
+            gb1 = b1.getGreen();
+            bb1 = b1.getBlue();
+            b1.setRGB(b2.getRed(), b2.getGreen(), b2.getBlue());
+            b2.setRGB(rb1, gb1, bb1);
+        }
     }
 
-    public void agarIO(Ball b1, Ball b2, ArrayList<Ball> temp, int i) {
-        b1.setRadius(b2.getRadius()+b1.getRadius());
-        b2.setRadius(b1.getRadius()+b2.getRadius());
-        if(temp.size() !=1)
-        temp.remove(i);
+    public void agarIO(Ball b1, Ball b2, ArrayList<Ball> temp, int i, boolean truth) {
+        if (truth == true) {
+            b1.setRadius(b2.getRadius() + b1.getRadius());
+            b2.setRadius(b1.getRadius() + b2.getRadius());
+            if (temp.size() > 1)
+                temp.remove(i);
+        }
     }
 
     public void setRGB(int red, int green, int blue) {
@@ -129,52 +148,52 @@ public class Ball {
         return false;
     }
 
-    public void resolveCollision(Ball ball) {
+    public void resolveCollision(Ball ball, boolean truth) {
+        if (truth == true) {
+            // get the mtd
+            Vector2d delta = (position.subtract(ball.position));
+            float r = getRadius() + ball.getRadius();
+            float dist2 = delta.dot(delta);
 
-        // get the mtd
-        Vector2d delta = (position.subtract(ball.position));
-        float r = getRadius() + ball.getRadius();
-        float dist2 = delta.dot(delta);
+            if (dist2 > r * r) return; // they aren't colliding
 
-        if (dist2 > r * r) return; // they aren't colliding
+            float d = delta.getLength();
 
-        float d = delta.getLength();
+            Vector2d mtd;
+            if (d != 0.0f) {
+                mtd = delta.multiply(((getRadius() + ball.getRadius()) - d) / d); // minimum translation distance to push balls apart after intersecting
 
-        Vector2d mtd;
-        if (d != 0.0f) {
-            mtd = delta.multiply(((getRadius() + ball.getRadius()) - d) / d); // minimum translation distance to push balls apart after intersecting
+            } else // Special case. Balls are exactly on top of eachother.  Don't want to divide by zero.
+            {
+                d = ball.getRadius() + getRadius() - 1.0f;
+                delta = new Vector2d(ball.getRadius() + getRadius(), 0.0f);
 
-        } else // Special case. Balls are exactly on top of eachother.  Don't want to divide by zero.
-        {
-            d = ball.getRadius() + getRadius() - 1.0f;
-            delta = new Vector2d(ball.getRadius() + getRadius(), 0.0f);
+                mtd = delta.multiply(((getRadius() + ball.getRadius()) - d) / d);
+            }
 
-            mtd = delta.multiply(((getRadius() + ball.getRadius()) - d) / d);
+            // resolve intersection
+            float mass1 = 1 / getMass(); // inverse mass quantities
+            float mass2 = 1 / ball.getMass();
+
+            // push-pull them apart
+            position = position.add(mtd.multiply(mass1 / (mass1 + mass2)));
+            ball.position = ball.position.subtract(mtd.multiply(mass2 / (mass1 + mass2)));
+
+            // impact speed
+            Vector2d v = (this.velocity.subtract(ball.velocity));
+            float vn = v.dot(mtd.normalize());
+
+            // sphere intersecting but moving away from each other already
+            if (vn > 0.0f) return;
+
+            // collision impulse
+            float i = (-(1.0f + Constants.restitution) * vn) / (mass1 + mass2);
+            Vector2d impulse = mtd.multiply(i);
+
+            // change in momentum
+            this.velocity = this.velocity.add(impulse.multiply(mass1));
+            ball.velocity = ball.velocity.subtract(impulse.multiply(mass2));
         }
-
-        // resolve intersection
-        float mass1 = 1 / getMass(); // inverse mass quantities
-        float mass2 = 1 / ball.getMass();
-
-        // push-pull them apart
-        position = position.add(mtd.multiply(mass1 / (mass1 + mass2)));
-        ball.position = ball.position.subtract(mtd.multiply(mass2 / (mass1 + mass2)));
-
-        // impact speed
-        Vector2d v = (this.velocity.subtract(ball.velocity));
-        float vn = v.dot(mtd.normalize());
-
-        // sphere intersecting but moving away from each other already
-        if (vn > 0.0f) return;
-
-        // collision impulse
-        float i = (-(1.0f + Constants.restitution) * vn) / (mass1 + mass2);
-        Vector2d impulse = mtd.multiply(i);
-
-        // change in momentum
-        this.velocity = this.velocity.add(impulse.multiply(mass1));
-        ball.velocity = ball.velocity.subtract(impulse.multiply(mass2));
-
     }
 
     public void movePhysics() {
