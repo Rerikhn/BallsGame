@@ -24,7 +24,7 @@ public class Ball {
     private float density;
     private float capacity;
 
-    /**  */
+    /** Color by RGB */
     private int red;
     private int green;
     private int blue;
@@ -38,13 +38,9 @@ public class Ball {
         position = new Vector2d(
                 (r.nextInt() * ((BOX_WIDTH - radius) - BOX_WIDTH / 2) + BOX_WIDTH / 2),
                 (r.nextInt() * ((BOX_HEIGHT - radius) - BOX_HEIGHT / 2) + BOX_HEIGHT / 2));
-
         radius = (r.nextFloat() * (7 - 2) + 2);
-
         mass = radius * Constants.pi;
-
         density = mass / Constants.pi;
-
         red = r.nextInt(255);
         green = r.nextInt(255);
         blue = r.nextInt(255);
@@ -54,12 +50,10 @@ public class Ball {
     public Ball(Vector2d velocity, float radius, float mas) {
         this.velocity = velocity;
         this.radius = radius;
-
         position = new Vector2d(
                 (r.nextInt() * ((BOX_WIDTH - radius) - BOX_WIDTH / 2) + BOX_WIDTH / 2),
                 (r.nextInt() * ((BOX_HEIGHT - radius) - BOX_HEIGHT / 2) + BOX_HEIGHT / 2));
         mass = mas + (radius * Constants.pi); //Manual mass to biggest ball
-
         red = r.nextInt(255);
         green = r.nextInt(255);
         blue = r.nextInt(255);
@@ -105,32 +99,12 @@ public class Ball {
         return red;
     }
 
-    public float getVelocityX() {
-        return velocity.getX();
-    }
-
-    public float getVelocityY() {
-        return velocity.getY();
-    }
-
-    public void setVelocityX(float x) {
-        this.velocity.setX(x);
-    }
-
-    public void setVelocityY(float y) {
-        this.velocity.setY(y);
-    }
-
     public int getGreen() {
         return green;
     }
 
     public int getBlue() {
         return blue;
-    }
-
-    public void setMass(float mass) {
-        this.mass = mass;
     }
 
     public float getMass() {
