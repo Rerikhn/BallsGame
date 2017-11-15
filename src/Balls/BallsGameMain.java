@@ -3,23 +3,33 @@ package Balls;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class BallsMain {
+public class BallsGameMain {
 
     private JFrame mainWindow;
-    private JButton start;
 
-    BallsMain() {
+    BallsGameMain() {
+
         mainWindow = new JFrame("Menu");
-        start = new JButton("Start");
-        start.setBounds(115, 150, 150, 80);
+
+        /**Start Button*/
+        JButton start = new JButton("Start");
+        start.setBounds(3, 680, 1360, 60);
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 t.start();
             }
         });
+
+        JSlider maxRadiusBig = new JSlider(JSlider.HORIZONTAL, 50,100, 50 );
+        maxRadiusBig.setBounds(10, 600, 100,60);
+        maxRadiusBig.setMinorTickSpacing(50);
+        maxRadiusBig.setMajorTickSpacing(100);
+        maxRadiusBig.setPaintLabels(true);
+        maxRadiusBig.setPaintTicks(true);
+
         mainWindow.add(start);
-        mainWindow.setSize(1366, 768);
+        mainWindow.add(maxRadiusBig);
         mainWindow.setLayout(null);
         mainWindow.setVisible(true);
         mainWindow.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -41,6 +51,6 @@ public class BallsMain {
     Thread t = new Thread(r);
 
     public static void main(String[] args) {
-        new BallsMain();
+        new BallsGameMain();
     }
 }

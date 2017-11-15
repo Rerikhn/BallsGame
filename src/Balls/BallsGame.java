@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.Formatter;
-import java.util.List;
+import java.util.Timer;
 
 public class BallsGame
         extends JPanel
@@ -22,15 +22,15 @@ public class BallsGame
     private int canvasWidth;
     private int canvasHeight;
     private DrawCanvas canvas;
-    private JMenu menu, submenu;
-    private JMenuItem i1, i2, i3, bigBall;
-    private JCheckBox recolor, colliding, agarIO;
-    private Thread game;
+    private JCheckBox agarIO;
     private float massBig;
     private boolean truthColor = false;
     private boolean truthCollide = false;
     private boolean truthIO = false;
     private int click;
+
+    private Thread game;
+    private Thread timer;
 
     /**
      * The current motion of this ball.
@@ -39,7 +39,7 @@ public class BallsGame
 
 
     /*** Draw frame per second*/
-    private static int UPDATE_RATE = 60;
+    private static int UPDATE_RATE = 120;
 
     /*** Count of balls */
     int count = 0;
@@ -48,40 +48,42 @@ public class BallsGame
         JMenuBar bar = new JMenuBar();
 
         /** Upper menu */
-        menu = new JMenu("Menu");
-        submenu = new JMenu("Specific");
+        JMenu menu = new JMenu("Menu");
+        JMenu submenu = new JMenu("Specific");
 
         /** Throw a big ball */
-        bigBall = new JMenuItem("Run the big!");
+        JMenuItem bigBall = new JMenuItem("Run the big!");
         bigBall.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Vector2d velocity = new Vector2d(6, 6);
-                balls.add(new Ball(velocity, 50, massBig));
+                balls.add(new Ball(velocity, 60, BallsGame.this.massBig));
             }
         });
 
         /** Pause thread */
-        i1 = new JMenuItem("Pause");
-        i1.addActionListener(new ActionListener() {
+        JMenuItem pause = new JMenuItem("Pause");
+        pause.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                timer.suspend();
                 game.suspend();
             }
         });
 
         /** Resume thread */
-        i2 = new JMenuItem("Resume");
-        i2.addActionListener(new ActionListener() {
+        JMenuItem resume = new JMenuItem("Resume");
+        resume.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 game.resume();
+                timer.resume();
             }
         });
 
         /** Reset count of balls */
-        i3 = new JMenuItem("Reset");
-        i3.addActionListener(new ActionListener() {
+        JMenuItem reset = new JMenuItem("Reset");
+        reset.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 count = 0;
@@ -89,7 +91,8 @@ public class BallsGame
             }
         });
 
-        recolor = new JCheckBox("Reverse color");
+        /** Reverse colors of both balls if collide */
+        JCheckBox recolor = new JCheckBox("Reverse color");
         recolor.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -98,6 +101,20 @@ public class BallsGame
                     truthColor = true;
                 } else {
                     truthColor = false;
+                }
+            }
+        });
+
+        /** Add 1 ball for 1 second */
+        JCheckBox timer = new JCheckBox("Timer");
+        timer.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                JCheckBox cbLog = (JCheckBox) e.getSource();
+                if (cbLog.isSelected()) {
+                    addByTimer(true);
+                } else {
+                    addByTimer(false);
                 }
             }
         });
@@ -115,8 +132,8 @@ public class BallsGame
             }
         });*/
 
-
-        colliding = new JCheckBox("ON/OFF colliding");
+        /** Turn on/off colliding */
+        JCheckBox colliding = new JCheckBox("ON/OFF colliding");
         colliding.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -129,38 +146,40 @@ public class BallsGame
             }
         });
 
-
-        SpinnerModel value = new SpinnerNumberModel(1,1,100,1);
+        /** Set the count to generate balls */
+        SpinnerModel value = new SpinnerNumberModel(1, 0, 100, 10);
         JSpinner clicks = new JSpinner(value);
+        //setting up default clicks by one
+        click = (int) clicks.getValue();
         clicks.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                click = (int)((JSpinner)e.getSource()).getValue();
+                click = (int) ((JSpinner) e.getSource()).getValue();
             }
         });
         JMenu spinMenu = new JMenu("Clicks");
         spinMenu.add(clicks);
 
-
-        JSlider speed = new JSlider(0, 1000, 0);
-        speed.addChangeListener(new ChangeListener() {
+        /** Set the mass of big ball */
+        JSlider massBig = new JSlider(0, 1000, 0);
+        massBig.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 if (source.getValueIsAdjusting()) {
-                    massBig = source.getValue();
+                    BallsGame.this.massBig = source.getValue();
                 }
             }
         });
-        speed.setMinorTickSpacing(1);
-        speed.setMajorTickSpacing(19);
-        speed.setPaintTicks(true);
-        speed.setPaintLabels(true);
-        JMenu speedMenu = new JMenu("Mass of big ball");
-        speedMenu.add(speed);
+        massBig.setMinorTickSpacing(1);
+        massBig.setMajorTickSpacing(300);
+        massBig.setPaintTicks(true);
+        massBig.setPaintLabels(true);
+        JMenu massBigMenu = new JMenu("Mass of big ball");
+        massBigMenu.add(massBig);
 
-
-        JSlider js = new JSlider(30, 1000, UPDATE_RATE);
+        /** Set update rate */
+        JSlider js = new JSlider(2, 1000, UPDATE_RATE);
         js.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -177,16 +196,18 @@ public class BallsGame
         JMenu update = new JMenu("Update Rate");
         update.add(js);
 
-        submenu.add(i3);
+        /** Adding all to upper menu */
+        submenu.add(reset);
         submenu.add(bigBall);
-        menu.add(i1);
-        menu.add(i2);
+        menu.add(pause);
+        menu.add(resume);
         menu.add(submenu);
         bar.add(menu);
         bar.add(update);
-        bar.add(speedMenu);
+        bar.add(massBigMenu);
         bar.add(recolor);
         bar.add(colliding);
+        bar.add(timer);
         //bar.add(agarIO);
         bar.add(spinMenu);
 
@@ -195,7 +216,7 @@ public class BallsGame
         box = new Container();
         canvas = new DrawCanvas();
 
-        /**JPanel with balls*/
+        /** JPanel with balls*/
         this.setLayout(new BorderLayout());
         this.add(canvas, BorderLayout.CENTER);
         this.add(bar, BorderLayout.NORTH);
@@ -204,6 +225,9 @@ public class BallsGame
         start();
     }
 
+    /**
+     * Thread of balls
+     */
     public void start() {
         game = new Thread() {
             @Override
@@ -221,6 +245,9 @@ public class BallsGame
         game.start();
     }
 
+    /**
+     * Main method to organize logic
+     */
     public void updateFrame() {
         Ball[] ball = balls.toArray(new Ball[balls.size()]);
         for (int i = 0; i < ball.length; i++) {
@@ -235,6 +262,9 @@ public class BallsGame
         }
     }
 
+    /**
+     * JPanel with balls
+     */
     class DrawCanvas extends JPanel {
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -261,9 +291,30 @@ public class BallsGame
             formatter.format("Current update rate: " + UPDATE_RATE);
             g.drawString(sb.toString(), 170, 30);
         }
-
         public Dimension getPreferredSize() {
             return (new Dimension(canvasWidth, canvasHeight));
+        }
+    }
+
+    public void addByTimer(boolean t) {
+        if (t == true) {
+            timer = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (balls.size() < 1500) {
+                        count += click;
+                        for (int i = 0; i < click; i++)
+                            balls.add(new Ball());
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                }
+            });
+            timer.start();
+        } else {
+            timer.stop();
         }
     }
 
@@ -284,7 +335,7 @@ public class BallsGame
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (balls.size() < 10000) {
+        if (balls.size() < 1500) {
             count += click;
             for (int i = 0; i < click; i++)
                 balls.add(new Ball());

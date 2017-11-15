@@ -6,30 +6,32 @@ import java.util.Random;
 
 public class Ball {
 
-    //size of Box
-    private static final int BOX_HEIGHT = 725;
+    /**Size window of manual settings*/
+    private static final int BOX_HEIGHT = 719;
     private static final int BOX_WIDTH = 1366;
 
-    Random r = new Random();
+    private Random r = new Random();
 
-    /**
-     * For Vectors
-     */
+    /**For Vectors*/
     private Vector2d velocity;
     private Vector2d position;
 
     private float radius;
+    private float maxRadius;
+    private float minRadius;
+
     private float mass;
     private float density;
     private float capacity;
 
-    //color palette by RGB
+    /**  */
     private int red;
     private int green;
     private int blue;
 
     public Ball() {
-        /** Randomize Vector's for each */
+        /** Main constructor of balls
+         *  Randomize Vector's and color for each */
         velocity = new Vector2d((r.nextFloat() * (2f - 0.1f) + 0.1f),
                 (r.nextFloat() * (2f - 0.1f) + 0.1f));
 
@@ -43,17 +45,12 @@ public class Ball {
 
         density = mass / Constants.pi;
 
-        /**
-         * Randomize color set for each
-         * */
         red = r.nextInt(255);
         green = r.nextInt(255);
         blue = r.nextInt(255);
     }
 
-    /**
-     * THE BIG BALL!!!
-     */
+    /**THE BIG BALL!!!*/
     public Ball(Vector2d velocity, float radius, float mas) {
         this.velocity = velocity;
         this.radius = radius;
@@ -103,6 +100,7 @@ public class Ball {
         this.blue = blue;
     }
 
+
     public int getRed() {
         return red;
     }
@@ -119,7 +117,7 @@ public class Ball {
         this.velocity.setX(x);
     }
 
-    public void setVelocityY (float y) {
+    public void setVelocityY(float y) {
         this.velocity.setY(y);
     }
 
