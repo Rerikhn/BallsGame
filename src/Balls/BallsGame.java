@@ -7,7 +7,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.Formatter;
-import java.util.Timer;
 
 public class BallsGame
         extends JPanel
@@ -28,6 +27,7 @@ public class BallsGame
     private boolean truthCollide = false;
     private boolean truthIO = false;
     private int click;
+    private int countCollide;
 
     private Thread game;
     private Thread timer;
@@ -87,6 +87,7 @@ public class BallsGame
             @Override
             public void actionPerformed(ActionEvent e) {
                 count = 0;
+                countCollide = 0;
                 balls.clear();
             }
         });
@@ -142,6 +143,20 @@ public class BallsGame
                     truthCollide = true;
                 } else {
                     truthCollide = false;
+                }
+            }
+        });
+
+        /** Turn on/off agarIO */
+        JCheckBox eat = new JCheckBox("AgarIO");
+        eat.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                JCheckBox cbLog = (JCheckBox) e.getSource();
+                if (cbLog.isSelected()) {
+                    truthIO = true;
+                } else {
+                    truthIO = false;
                 }
             }
         });
@@ -208,6 +223,7 @@ public class BallsGame
         bar.add(recolor);
         bar.add(colliding);
         bar.add(timer);
+        bar.add(eat);
         //bar.add(agarIO);
         bar.add(spinMenu);
 
@@ -249,13 +265,16 @@ public class BallsGame
      * Main method to organize logic
      */
     public void updateFrame() {
-        Ball[] ball = balls.toArray(new Ball[balls.size()]);
-        for (int i = 0; i < ball.length; i++) {
-            ball[i].movePhysics();
-            for (int j = i + 1; j < ball.length; j++) {
-                if (ball[i].colliding(ball[j])) {
-                    ball[i].resolveCollision(ball[j], truthCollide);
-                    ball[i].reverseColor(ball[j], truthColor);
+        //Ball[] ball = balls.toArray(new Ball[balls.size()]);
+        for (int i = 0; i < balls.size(); i++) {
+            //ball[i].movePhysics();
+            balls.get(i).movePhysics();
+            for (int j = i + 1; j < balls.size(); j++) {
+                if (balls.get(i).colliding(balls.get(j))) {
+                    countCollide++;
+                    balls.get(i).resolveCollision(balls.get(j), truthCollide);
+                    balls.get(i).reverseColor(balls.get(j), truthColor);
+                    balls.get(i).eatSmall(balls.get(j), j, i, balls, truthIO);
                     //ball[i].agarIO(ball[j], balls, j, truthIO);
                 }
             }
@@ -290,7 +309,16 @@ public class BallsGame
             formatter = new Formatter(sb);
             formatter.format("Current update rate: " + UPDATE_RATE);
             g.drawString(sb.toString(), 170, 30);
+
+            /** Count of bump */
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Courier New", Font.PLAIN, 12));
+            sb = new StringBuilder();
+            formatter = new Formatter(sb);
+            formatter.format("Count of collision " + countCollide);
+            g.drawString(sb.toString(), 370, 30);
         }
+
         public Dimension getPreferredSize() {
             return (new Dimension(canvasWidth, canvasHeight));
         }

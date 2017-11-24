@@ -6,13 +6,17 @@ import java.util.Random;
 
 public class Ball {
 
-    /**Size window of manual settings*/
+    /**
+     * Size window of manual settings
+     */
     private static final int BOX_HEIGHT = 719;
     private static final int BOX_WIDTH = 1366;
 
     private Random r = new Random();
 
-    /**For Vectors*/
+    /**
+     * For Vectors
+     */
     private Vector2d velocity;
     private Vector2d position;
 
@@ -24,7 +28,9 @@ public class Ball {
     private float density;
     private float capacity;
 
-    /** Color by RGB */
+    /**
+     * Color by RGB
+     */
     private int red;
     private int green;
     private int blue;
@@ -46,7 +52,9 @@ public class Ball {
         blue = r.nextInt(255);
     }
 
-    /**THE BIG BALL!!!*/
+    /**
+     * THE BIG BALL!!!
+     */
     public Ball(Vector2d velocity, float radius, float mas) {
         this.velocity = velocity;
         this.radius = radius;
@@ -81,19 +89,11 @@ public class Ball {
         }
     }
 
-    public void agarIO(Ball b1, ArrayList<Ball> temp, int i, boolean truth) {
-        if (truth == true) {
-            float rad = b1.getRadius();
-            this.setRadius(getRadius() + rad);
-        }
-    }
-
     public void setRGB(int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
     }
-
 
     public int getRed() {
         return red;
@@ -132,6 +132,20 @@ public class Ball {
             return true;
         }
         return false;
+    }
+
+    public void eatSmall(Ball ball, int j, int i, ArrayList<Ball> temp, boolean t) {
+        if (t == true) {
+            if (getRadius() > ball.getRadius()) {
+                setRadius(getRadius() + ball.getRadius() / 5);
+                temp.remove(j);
+            } else {
+                ball.setRadius(ball.getRadius() + getRadius() / 5);
+                temp.remove(i);
+            }
+            if (getRadius() >= 200) temp.remove(i);
+            if (ball.getRadius() >= 200) temp.remove(j);
+        }
     }
 
     public void resolveCollision(Ball ball, boolean truth) {
