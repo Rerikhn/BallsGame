@@ -58,7 +58,7 @@ public class Ball {
     public Ball(Vector2d velocity, float radius, float mas) {
         this.velocity = velocity;
         this.radius = radius;
-        position = new Vector2d(
+        position = new Vector2d (
                 (r.nextInt() * ((BOX_WIDTH - radius) - BOX_WIDTH / 2) + BOX_WIDTH / 2),
                 (r.nextInt() * ((BOX_HEIGHT - radius) - BOX_HEIGHT / 2) + BOX_HEIGHT / 2));
         mass = mas + (radius * Constants.pi); //Manual mass to biggest ball

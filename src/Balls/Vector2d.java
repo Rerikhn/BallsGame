@@ -47,7 +47,9 @@ public class Vector2d {
     }
 
     public float getDistance(Vector2d v2) {
-        return (float) Math.sqrt((v2.getX() - getX()) * (v2.getX() - getX()) + (v2.getY() - getY()) * (v2.getY() - getY()));
+        return (float) Math.sqrt((v2.getX() - getX())
+         * (v2.getX() - getX()) + (v2.getY() - getY())
+         * (v2.getY() - getY()));
     }
 
     public Vector2d add(Vector2d v2) {

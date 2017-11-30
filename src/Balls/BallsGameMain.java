@@ -7,7 +7,7 @@ public class BallsGameMain {
 
     private JFrame mainWindow;
 
-    BallsGameMain() {
+    private BallsGameMain() {
 
         mainWindow = new JFrame("Menu");
 
@@ -37,7 +37,7 @@ public class BallsGameMain {
         mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
-    Runnable r = new Runnable() {
+    private Runnable r = new Runnable() {
         @Override
         public void run() {
             mainWindow.setTitle("Game");
@@ -48,7 +48,7 @@ public class BallsGameMain {
             mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
     };
-    Thread t = new Thread(r);
+    private Thread t = new Thread(r);
 
     public static void main(String[] args) {
         new BallsGameMain();

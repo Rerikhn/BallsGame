@@ -18,10 +18,8 @@ public class BallsGame
     protected ArrayList<Ball> balls = new ArrayList<Ball>();
 
     private Container box;
-    private int canvasWidth;
-    private int canvasHeight;
-    private DrawCanvas canvas;
-    private JCheckBox agarIO;
+    private double canvasWidth;
+    private double canvasHeight;
     private float massBig;
     private boolean truthColor = false;
     private boolean truthCollide = false;
@@ -42,7 +40,7 @@ public class BallsGame
     private static int UPDATE_RATE = 120;
 
     /*** Count of balls */
-    int count = 0;
+    private int count = 0;
 
     public BallsGame(int width, int height) {
         JMenuBar bar = new JMenuBar();
@@ -66,8 +64,8 @@ public class BallsGame
         pause.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                timer.suspend();
                 game.suspend();
+                timer.suspend();
             }
         });
 
@@ -226,11 +224,12 @@ public class BallsGame
         bar.add(eat);
         //bar.add(agarIO);
         bar.add(spinMenu);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        canvasWidth = width;
-        canvasHeight = height;
+        canvasWidth = screenSize.getWidth();
+        canvasHeight = screenSize.getHeight();
         box = new Container();
-        canvas = new DrawCanvas();
+        DrawCanvas canvas = new DrawCanvas();
 
         /** JPanel with balls*/
         this.setLayout(new BorderLayout());
@@ -244,15 +243,19 @@ public class BallsGame
     /**
      * Thread of balls
      */
-    public void start() {
+    private void start() {
         game = new Thread() {
             @Override
             public void run() {
                 while (true) {
+                    long beginTimeMillis, timeTakenMillis, timeLeftMillis;
+                    beginTimeMillis = System.currentTimeMillis();
                     updateFrame();
                     repaint();
+                    timeTakenMillis = System.currentTimeMillis() - beginTimeMillis;
+                    timeLeftMillis = Math.abs(1000L / UPDATE_RATE - timeTakenMillis);
                     try {
-                        Thread.sleep(1000 / UPDATE_RATE);
+                        Thread.sleep(timeLeftMillis);
                     } catch (InterruptedException e) {
                     }
                 }
@@ -264,10 +267,8 @@ public class BallsGame
     /**
      * Main method to organize logic
      */
-    public void updateFrame() {
-        //Ball[] ball = balls.toArray(new Ball[balls.size()]);
+    private void updateFrame() {
         for (int i = 0; i < balls.size(); i++) {
-            //ball[i].movePhysics();
             balls.get(i).movePhysics();
             for (int j = i + 1; j < balls.size(); j++) {
                 if (balls.get(i).colliding(balls.get(j))) {
@@ -275,7 +276,6 @@ public class BallsGame
                     balls.get(i).resolveCollision(balls.get(j), truthCollide);
                     balls.get(i).reverseColor(balls.get(j), truthColor);
                     balls.get(i).eatSmall(balls.get(j), j, i, balls, truthIO);
-                    //ball[i].agarIO(ball[j], balls, j, truthIO);
                 }
             }
         }
@@ -290,8 +290,8 @@ public class BallsGame
 
             /** Normal box drawing */
             box.draw(g);
-            for (Ball ball : balls) {
-                ball.draw(g);
+            for(int i=0; i<balls.size(); i++) {
+                balls.get(i).draw(g);
             }
 
             /** Count information */
@@ -320,11 +320,11 @@ public class BallsGame
         }
 
         public Dimension getPreferredSize() {
-            return (new Dimension(canvasWidth, canvasHeight));
+            return (new Dimension((int)canvasWidth, (int)canvasHeight));
         }
     }
 
-    public void addByTimer(boolean t) {
+    private void addByTimer(boolean t) {
         if (t == true) {
             timer = new Thread(new Runnable() {
                 @Override
@@ -363,7 +363,7 @@ public class BallsGame
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (balls.size() < 1500) {
+        if (balls.size() < 1100) {
             count += click;
             for (int i = 0; i < click; i++)
                 balls.add(new Ball());
