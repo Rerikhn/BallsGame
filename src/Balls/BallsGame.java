@@ -15,7 +15,7 @@ public class BallsGame
     /**
      * ArrayList of many balls
      */
-    protected ArrayList<Ball> balls = new ArrayList<Ball>();
+    protected ArrayList<Ball> balls = new ArrayList<>();
 
     private Container box;
     private double canvasWidth;
@@ -42,7 +42,7 @@ public class BallsGame
     /*** Count of balls */
     private int count = 0;
 
-    public BallsGame(int width, int height) {
+    BallsGame() {
         JMenuBar bar = new JMenuBar();
 
         /** Upper menu */
@@ -51,12 +51,9 @@ public class BallsGame
 
         /** Throw a big ball */
         JMenuItem bigBall = new JMenuItem("Run the big!");
-        bigBall.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Vector2d velocity = new Vector2d(6, 6);
-                balls.add(new Ball(velocity, 60, BallsGame.this.massBig));
-            }
+        bigBall.addActionListener(e -> {
+            Vector2d velocity = new Vector2d(6, 6);
+            balls.add(new Ball(velocity, 60, BallsGame.this.massBig));
         });
 
         /** Pause thread */
@@ -92,15 +89,12 @@ public class BallsGame
 
         /** Reverse colors of both balls if collide */
         JCheckBox recolor = new JCheckBox("Reverse color");
-        recolor.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                JCheckBox cbLog = (JCheckBox) e.getSource();
-                if (cbLog.isSelected()) {
-                    truthColor = true;
-                } else {
-                    truthColor = false;
-                }
+        recolor.addItemListener(e -> {
+            JCheckBox cbLog = (JCheckBox) e.getSource();
+            if (cbLog.isSelected()) {
+                truthColor = true;
+            } else {
+                truthColor = false;
             }
         });
 
